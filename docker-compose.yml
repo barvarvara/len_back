@@ -1,0 +1,39 @@
+version: '3'
+
+services: # the different images that will be running as containers
+  db:
+    container_name: db
+
+    ports:
+      - "5432:5432"
+
+    # image name of the postgres database. during build, this will be pulled from dockerhub and a container spun up from it.
+    image: postgres:11-alpine
+
+    # access credentials from the .env file
+    environment:
+      - POSTGRES_DB=len_ceramic
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=134340
+
+  backend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: /Dockerfile
+    command: sh -c "python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=len_ceramic
+      - DB_USER=postgres
+      - DB_PASS=134340
+      - DB_PORT=5432
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/len_back
+    depends_on:
+      - db
+
