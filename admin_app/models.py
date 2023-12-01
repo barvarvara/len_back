@@ -34,7 +34,7 @@ class Clients(models.Model):
     name = models.CharField(max_length=100)
     fcs = models.CharField(max_length=120)
     client_type = models.ForeignKey("ClientTypes", on_delete=models.CASCADE)
-    contacts = models.ForeignKey("Contacts", on_delete=models.CASCADE, related_name='+')
+    contacts = models.ForeignKey("Contacts", on_delete=models.CASCADE, related_name='+', null=True, default='null')
     client_status = models.ForeignKey("ClientStatuses", on_delete=models.CASCADE)
 
     def get_fcs(self):
@@ -72,7 +72,7 @@ class Classes(models.Model):
     date = models.DateField(verbose_name='Дата')
     time = models.TimeField(verbose_name='Время')
     next_date = models.DateField(verbose_name='Дата следующего занятия')
-    comment = models.CharField(max_length=500, verbose_name='Комментарий')
+    comment = models.CharField(max_length=500, verbose_name='Комментарий', default=" ", null=True)
 
     def __str__(self):
         return f'{self.date} {self.time} {self.class_type.name}'
@@ -168,6 +168,9 @@ class Certificates(models.Model):
     class_type = models.ForeignKey("ClassTypes", on_delete=models.CASCADE)
     comment = models.CharField(max_length=400)
 
+    def __str__(self):
+        return f'{self.purchase_date} {self.cost} покупатель: {self.client_buyer.name}; получатель: {self.client_recipient.name}'
+
     class Meta:
         db_table = 'certificates'
         verbose_name = 'Сертификат'
@@ -235,10 +238,11 @@ class ClientsContacts(models.Model):
     client = models.ForeignKey("Clients", on_delete=models.CASCADE)
     contacts_type = models.ForeignKey("ContactsTypes", on_delete=models.CASCADE, verbose_name='Тип контактного лица')
 
-    class Meta:
-        # UniqueConstraint(fields=['contacts', 'client'], name='client_contacts_name')
-        unique_together = ('contacts', 'client')
+    def __str__(self):
+        return f'{self.client.get_fcs()} {self.contacts_type}'
 
+    class Meta:
+        unique_together = ('contacts', 'client')
         db_table = 'clients_contacts'
         verbose_name = 'Контактные данные клиентов'
         verbose_name_plural = 'Контактные данные клиентов'

@@ -8,6 +8,8 @@ services: # the different images that will be running as containers
       - POSTGRES_DB=len_db
       - POSTGRES_USER=dbuser
       - POSTGRES_PASSWORD=134340
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
   backend:
     container_name: backend
@@ -26,3 +28,6 @@ services: # the different images that will be running as containers
       - ./:/len_back
     depends_on:
       - db
+
+volumes:
+  pgdata:
