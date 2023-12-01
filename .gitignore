@@ -98,10 +98,8 @@ media
 # User-specific stuff
 
 # AWS User-specific
-.idea/**/aws.xml
 
 # Generated files
-.idea/**/contentModel.xml
 
 # Sensitive or high-churn files
 .idea/**/dataSources/
