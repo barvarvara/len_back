@@ -15,25 +15,37 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+
+from django.shortcuts import redirect
+from django.urls import path, include
 from rest_framework import routers
-from admin_app.views import ClientsView, ProductsView, ClassesView, CertificateView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+
+from admin_app.views import ClientsView, ClassesView, CertificateView, ProductsView
+
+router = routers.DefaultRouter()
+router.register(r'clients', ClientsView)
+router.register(r'clients/<int:pk>', ClientsView)
+
+router.register(r'products', ProductsView)
+router.register(r'products/<int:pk>', ProductsView)
+
+router.register(r'classes', ClassesView)
+router.register(r'classes/<int:pk>', ClassesView)
+
+router.register(r'certificates', CertificateView)
+router.register(r'classes/<int:pk>', CertificateView)
+
+
+def index(request):
+    return redirect('api/')
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', index),
+    path('api/', include(router.urls)),
+    path('api/token/', TokenObtainPairView.as_view()),
+    path('api/token/refresh/', TokenRefreshView.as_view()),
+    path('api/token/verify/', TokenVerifyView.as_view()),
 ]
-
-router = routers.DefaultRouter()
-router.register(r'api/clients', ClientsView)
-router.register(r'api/clients/<int:pk>', ClientsView)
-
-router.register(r'api/products', ProductsView)
-router.register(r'api/products/<int:pk>', ProductsView)
-
-router.register(r'api/classes', ClassesView)
-router.register(r'api/classes/<int:pk>', ClassesView)
-
-router.register(r'api/certificates', CertificateView)
-router.register(r'api/classes/<int:pk>', CertificateView)
-
-urlpatterns += router.urls

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from admin_app.models import Clients, Contacts, Products, Certificates, Classes
+from admin_app.models import Clients, Contacts, Certificates, Classes, Products
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -19,16 +19,6 @@ class ClassSerializer(serializers.ModelSerializer):
         fields = ('id', 'date', 'time', 'type_name', 'next_date', 'comment')
 
 
-class ProductSerializer(serializers.ModelSerializer):
-    type_name = serializers.CharField(source='product_type.name')
-    ready_state_name = serializers.CharField(source='ready_state.name')
-
-    class Meta:
-        model = Products
-        fields = ('id', 'name', 'definition', 'cost', 'type_name', 'first_class', 'ready_state_name')
-        depth = 1
-
-
 class CertificateSerializer(serializers.ModelSerializer):
     class_type_name = serializers.CharField(source='class_type.name')
 
@@ -38,4 +28,14 @@ class CertificateSerializer(serializers.ModelSerializer):
             'id', 'client_buyer', 'client_recipient', 'purchase_date', 'receiving_date', 'cost', 'cost_used',
             'class_type_name',
             'comment')
+        depth = 1
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    type_name = serializers.CharField(source='product_type.name')
+    ready_state_name = serializers.CharField(source='ready_state.name')
+
+    class Meta:
+        model = Products
+        fields = ('id', 'name', 'definition', 'cost', 'type_name', 'first_class', 'ready_state_name')
         depth = 1

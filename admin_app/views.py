@@ -1,17 +1,12 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
-from admin_app.models import Clients, Contacts, Products, Classes, Certificates
-from admin_app.serializers import ClientSerializer, ProductSerializer, ClassSerializer, CertificateSerializer
+from admin_app.models import Clients, Contacts, Classes, Certificates, Products
+from admin_app.serializers import ClientSerializer, ClassSerializer, CertificateSerializer, ProductSerializer
 
 
 class ClientsView(ModelViewSet):
     queryset = Clients.objects.all()
     serializer_class = ClientSerializer
-
-
-class ProductsView(ModelViewSet):
-    queryset = Products.objects.all()
-    serializer_class = ProductSerializer
 
 
 class ClassesView(ModelViewSet):
@@ -22,3 +17,8 @@ class ClassesView(ModelViewSet):
 class CertificateView(ModelViewSet):
     queryset = Certificates.objects.all()
     serializer_class = CertificateSerializer
+
+
+class ProductsView(ModelViewSet):
+    queryset = Products.objects.all()
+    serializer_class = ProductSerializer

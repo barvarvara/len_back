@@ -8,8 +8,11 @@ services: # the different images that will be running as containers
       - POSTGRES_DB=len_db
       - POSTGRES_USER=dbuser
       - POSTGRES_PASSWORD=134340
+      - POSTGRES_PORT=5432
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
   backend:
     container_name: backend
@@ -22,6 +25,7 @@ services: # the different images that will be running as containers
       - DB_NAME=len_db
       - DB_USER=dbuser
       - DB_PASS=134340
+      - DB_PORT=5432
     ports:
       - "8000:8000"
     volumes:
@@ -31,3 +35,4 @@ services: # the different images that will be running as containers
 
 volumes:
   pgdata:
+    driver: local

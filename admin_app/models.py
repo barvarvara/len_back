@@ -34,7 +34,7 @@ class Clients(models.Model):
     name = models.CharField(max_length=100)
     fcs = models.CharField(max_length=120)
     client_type = models.ForeignKey("ClientTypes", on_delete=models.CASCADE)
-    contacts = models.ForeignKey("Contacts", on_delete=models.CASCADE, related_name='+', null=True, default='null')
+    contacts = models.ForeignKey("Contacts", on_delete=models.CASCADE, related_name='+')
     client_status = models.ForeignKey("ClientStatuses", on_delete=models.CASCADE)
 
     def get_fcs(self):
@@ -72,7 +72,7 @@ class Classes(models.Model):
     date = models.DateField(verbose_name='Дата')
     time = models.TimeField(verbose_name='Время')
     next_date = models.DateField(verbose_name='Дата следующего занятия')
-    comment = models.CharField(max_length=500, verbose_name='Комментарий', default=" ", null=True)
+    comment = models.CharField(max_length=500, verbose_name='Комментарий')
 
     def __str__(self):
         return f'{self.date} {self.time} {self.class_type.name}'
@@ -81,80 +81,6 @@ class Classes(models.Model):
         db_table = 'classes'
         verbose_name = 'Занятие'
         verbose_name_plural = 'Занятия'
-
-
-class ProductTypes(models.Model):
-    id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=100)
-    start_cost = models.IntegerField()
-    definition = models.CharField(max_length=1000)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'product_types'
-        verbose_name = 'Тип изделия'
-        verbose_name_plural = 'Типы изделий'
-
-
-class ReadyStates(models.Model):
-    id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=40)
-    comment = models.CharField(max_length=500)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'ready_states'
-        verbose_name = 'Состояние готовности'
-        verbose_name_plural = 'Состояния готовности'
-
-
-class Products(models.Model):
-    id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=100)
-    definition = models.CharField(max_length=400)
-    cost = models.IntegerField()
-    product_type = models.ForeignKey("ProductTypes", on_delete=models.CASCADE)
-    first_class = models.ForeignKey("Classes", on_delete=models.CASCADE)
-    ready_state = models.ForeignKey("ReadyStates", on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'products'
-        verbose_name = 'Изделие'
-        verbose_name_plural = 'Изделия'
-
-
-class ActivityType(models.Model):
-    id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'activity_types'
-        verbose_name = 'Тип активностей'
-        verbose_name_plural = 'Типы активностей'
-
-
-class Activity(models.Model):
-    id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=100)
-    comment = models.CharField(max_length=1000)
-    activity_type = models.ForeignKey('ActivityType', on_delete=models.CASCADE)
-    client = models.ForeignKey('Clients', on_delete=models.CASCADE)
-    product = models.ForeignKey('Products', on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = "activities"
-        verbose_name = 'Активность'
-        verbose_name_plural = 'Активности'
 
 
 class Certificates(models.Model):
@@ -168,31 +94,10 @@ class Certificates(models.Model):
     class_type = models.ForeignKey("ClassTypes", on_delete=models.CASCADE)
     comment = models.CharField(max_length=400)
 
-    def __str__(self):
-        return f'{self.purchase_date} {self.cost} покупатель: {self.client_buyer.name}; получатель: {self.client_recipient.name}'
-
     class Meta:
         db_table = 'certificates'
         verbose_name = 'Сертификат'
         verbose_name_plural = 'Сертификаты'
-
-
-class Cheques(models.Model):
-    id = models.IntegerField(primary_key=True)
-    field_class = models.ForeignKey('Classes', models.DO_NOTHING, db_column='class_id')
-    client = models.ForeignKey('Clients', models.DO_NOTHING)
-    product = models.ForeignKey('Products', models.DO_NOTHING)
-    name = models.CharField(max_length=200)
-    sum = models.IntegerField()
-    comment = models.CharField(max_length=500)
-
-    def __str__(self):
-        return f'{self.name} {self.sum}'
-
-    class Meta:
-        db_table = 'cheques'
-        verbose_name = 'Счет'
-        verbose_name_plural = 'Счеты'
 
 
 class ContactsTypes(models.Model):
@@ -238,14 +143,25 @@ class ClientsContacts(models.Model):
     client = models.ForeignKey("Clients", on_delete=models.CASCADE)
     contacts_type = models.ForeignKey("ContactsTypes", on_delete=models.CASCADE, verbose_name='Тип контактного лица')
 
-    def __str__(self):
-        return f'{self.client.get_fcs()} {self.contacts_type}'
-
     class Meta:
+        # UniqueConstraint(fields=['contacts', 'client'], name='client_contacts_name')
         unique_together = ('contacts', 'client')
+
         db_table = 'clients_contacts'
         verbose_name = 'Контактные данные клиентов'
         verbose_name_plural = 'Контактные данные клиентов'
+
+
+class Guests(models.Model):
+    id = models.IntegerField(primary_key=True)
+    guest_class = models.ForeignKey("Classes", on_delete=models.CASCADE, db_column='class_id')
+    client = models.ForeignKey("Clients", on_delete=models.CASCADE)
+    contacts = models.ForeignKey("Contacts", on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'guests'
+        verbose_name = 'Гость'
+        verbose_name_plural = 'Гости'
 
 
 class ClientsGroup(models.Model):
@@ -256,60 +172,55 @@ class ClientsGroup(models.Model):
     class Meta:
         db_table = 'clients_group'
         unique_together = [('client_group', 'client')]
-        # constraints = [
-        #     models.UniqueConstraint(fields=['client_group', 'client'])  # client_and_group
-        # ]
         verbose_name = "Группа клиентов"
         verbose_name_plural = "Группы клиентов"
 
 
-class ContactsMedia(models.Model):
+class ProductTypes(models.Model):
     id = models.IntegerField(primary_key=True)
-    media = models.IntegerField(db_column="media_id")
-    nickname = models.CharField(max_length=100)
-    is_main = models.BooleanField()
-    contacts = models.ForeignKey("Contacts", on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    start_cost = models.IntegerField()
+    definition = models.CharField(max_length=1000)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
-        db_table = 'contacts_media'
-        verbose_name = 'Соц сети контактов'
-        verbose_name_plural = 'Соц сети контактов'
+        db_table = 'product_types'
+        verbose_name = 'Тип изделия'
+        verbose_name_plural = 'Типы изделий'
 
 
-class Media(models.Model):
-    id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=20)
-    site = models.CharField(max_length=30)
-    is_legal = models.BooleanField()
-    use_phone = models.BooleanField()
-
-    class Meta:
-        db_table = 'media'
-        verbose_name = 'Соц сети'
-        verbose_name_plural = 'Соц сети'
-
-
-class PaidType(models.Model):
+class ReadyStates(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=40)
+    comment = models.CharField(max_length=500)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
-        db_table = 'paid_types'
-        verbose_name = 'Тип оплаты'
-        verbose_name_plural = 'Типы оплаты'
+        db_table = 'ready_states'
+        verbose_name = 'Состояние готовности'
+        verbose_name_plural = 'Состояния готовности'
 
 
-class Payments(models.Model):
+class Products(models.Model):
     id = models.IntegerField(primary_key=True)
-    sum_paid = models.IntegerField()
-    paid_type = models.ForeignKey("PaidType", on_delete=models.CASCADE)
-    certificate = models.ForeignKey("Certificates", on_delete=models.CASCADE)
-    cheque = models.ForeignKey("Cheques", on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    definition = models.CharField(max_length=400)
+    cost = models.IntegerField()
+    product_type = models.ForeignKey("ProductTypes", on_delete=models.CASCADE, null=True)
+    first_class = models.ForeignKey(Classes, on_delete=models.CASCADE, null=True)
+    ready_state = models.ForeignKey("ReadyStates", on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
-        db_table = 'payments'
-        verbose_name = 'Платеж'
-        verbose_name_plural = 'Платежи'
+        db_table = 'products'
+        verbose_name = 'Изделие'
+        verbose_name_plural = 'Изделия'
 
 
 class PhotoTypes(models.Model):
@@ -325,23 +236,11 @@ class PhotoTypes(models.Model):
 class ProductPhotos(models.Model):
     id = models.IntegerField(primary_key=True)
     photo = models.CharField(max_length=400)
-    product_class = models.ForeignKey(Classes, on_delete=models.CASCADE, db_column='class_id')
-    product = models.ForeignKey("Products", on_delete=models.CASCADE)
-    photo_type = models.ForeignKey("PhotoTypes", on_delete=models.CASCADE)
+    product_class = models.ForeignKey(Classes, on_delete=models.CASCADE, db_column='class_id', null=True)
+    product = models.ForeignKey("Products", on_delete=models.CASCADE, null=True)
+    photo_type = models.ForeignKey("PhotoTypes", on_delete=models.CASCADE, null=True)
 
     class Meta:
         db_table = 'product_photos'
         verbose_name = 'Фото изделия'
         verbose_name_plural = 'Фото изделий'
-
-
-class Guests(models.Model):
-    id = models.IntegerField(primary_key=True)
-    quest_class = models.ForeignKey("Classes", on_delete=models.CASCADE, db_column='class_id')
-    client = models.ForeignKey("Clients", on_delete=models.CASCADE)
-    contacts = models.ForeignKey("Contacts", on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = 'guests'
-        verbose_name = 'Гость'
-        verbose_name_plural = 'Гости'
