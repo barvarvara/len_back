@@ -21,20 +21,22 @@ from django.urls import path, include
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
-from admin_app.views import ClientsView, ClassesView, CertificateView, ProductsView
+from admin_app.views import ClientsView, ClassesView, CertificateView, ProductsView, ClientContactsView
+from users_app.views import LoginViewSet, RegistrationViewSet, RefreshViewSet, UserViewSet
 
 router = routers.DefaultRouter()
+
+router.register(r'auth/login', LoginViewSet, basename='auth-login')
+router.register(r'auth/register', RegistrationViewSet, basename='auth-register')
+router.register(r'auth/refresh', RefreshViewSet, basename='auth-refresh')
+router.register(r'users', UserViewSet, basename='users')
+
 router.register(r'clients', ClientsView)
-router.register(r'clients/<int:pk>', ClientsView)
+router.register(r'client-contacts', ClientContactsView,  basename='client-contacts')
 
 router.register(r'products', ProductsView)
-router.register(r'products/<int:pk>', ProductsView)
-
 router.register(r'classes', ClassesView)
-router.register(r'classes/<int:pk>', ClassesView)
-
 router.register(r'certificates', CertificateView)
-router.register(r'classes/<int:pk>', CertificateView)
 
 
 def index(request):
@@ -45,6 +47,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index),
     path('api/', include(router.urls)),
+]
+
+urlpatterns += [
     path('api/token/', TokenObtainPairView.as_view()),
     path('api/token/refresh/', TokenRefreshView.as_view()),
     path('api/token/verify/', TokenVerifyView.as_view()),

@@ -3,12 +3,23 @@ from admin_app.models import Clients, Contacts, Certificates, Classes, Products
 
 
 class ClientSerializer(serializers.ModelSerializer):
-    contact_fcs = serializers.CharField(source='contacts.get_fcs')
-    phone = serializers.CharField(source='contacts.phone')
+    # contact_fcs = serializers.CharField(source='contacts.get_fcs')
+    # phone = serializers.CharField(source='contacts.phone')
+    # , 'contact_fcs', 'phone'
 
     class Meta:
         model = Clients
-        fields = ('id', 'name', 'fcs', 'client_type', 'client_status', 'contact_fcs', 'phone')
+        fields = ('id', 'name', 'fcs', 'client_type', 'client_status')
+        depth = 1
+
+
+class ContactsSerializer(serializers.ModelSerializer):
+    fcs = serializers.CharField(source='get_fcs')
+
+    class Meta:
+        model = Contacts
+        fields = ('id', 'fcs', 'phone', 'birthday', 'ban_on_spam')
+        depth = 1
 
 
 class ClassSerializer(serializers.ModelSerializer):
