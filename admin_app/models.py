@@ -2,7 +2,7 @@ from django.db import models
 
 
 class ClientStatuses(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     definition = models.CharField(max_length=400)
 
@@ -16,7 +16,7 @@ class ClientStatuses(models.Model):
 
 
 class ClientTypes(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     definition = models.CharField(max_length=400)
 
@@ -52,7 +52,7 @@ class Clients(models.Model):
 
 
 class ClassTypes(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=40)
     definition = models.CharField(max_length=200)
     start_cost = models.IntegerField()
@@ -67,7 +67,7 @@ class ClassTypes(models.Model):
 
 
 class Classes(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     class_type = models.ForeignKey("ClassTypes", on_delete=models.CASCADE, verbose_name='Тип занятия')
     date = models.DateField(verbose_name='Дата')
     time = models.TimeField(verbose_name='Время')
@@ -84,7 +84,7 @@ class Classes(models.Model):
 
 
 class Certificates(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     client_buyer = models.ForeignKey("Clients", on_delete=models.CASCADE, related_name='+')
     client_recipient = models.ForeignKey("Clients", on_delete=models.CASCADE)
     purchase_date = models.DateField()
@@ -101,7 +101,7 @@ class Certificates(models.Model):
 
 
 class ContactsTypes(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -153,7 +153,7 @@ class ClientsContacts(models.Model):
 
 
 class Guests(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     guest_class = models.ForeignKey("Classes", on_delete=models.CASCADE, db_column='class_id')
     client = models.ForeignKey("Clients", on_delete=models.CASCADE)
     contacts = models.ForeignKey("Contacts", on_delete=models.CASCADE)
@@ -177,7 +177,7 @@ class ClientsGroup(models.Model):
 
 
 class ProductTypes(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     start_cost = models.IntegerField()
     definition = models.CharField(max_length=1000)
@@ -192,7 +192,7 @@ class ProductTypes(models.Model):
 
 
 class ReadyStates(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=40)
     comment = models.CharField(max_length=500)
 
@@ -206,7 +206,7 @@ class ReadyStates(models.Model):
 
 
 class Products(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     definition = models.CharField(max_length=400)
     cost = models.IntegerField()
@@ -224,7 +224,7 @@ class Products(models.Model):
 
 
 class PhotoTypes(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=20)
 
     class Meta:
@@ -234,7 +234,7 @@ class PhotoTypes(models.Model):
 
 
 class ProductPhotos(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     photo = models.CharField(max_length=400)
     product_class = models.ForeignKey(Classes, on_delete=models.CASCADE, db_column='class_id', null=True)
     product = models.ForeignKey("Products", on_delete=models.CASCADE, null=True)

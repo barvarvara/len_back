@@ -1,10 +1,10 @@
 from django.core.validators import RegexValidator
 from django.db import models
 
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin, AbstractUser
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, AbstractUser
 
 
-class UserAccounts(AbstractUser, PermissionsMixin):
+class UserAccounts(AbstractUser):
     name = models.CharField(max_length=255)
     email = models.EmailField(max_length=255, unique=True)
     phone = models.CharField(max_length=14, unique=True, verbose_name='номер телефона')

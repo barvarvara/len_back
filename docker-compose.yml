@@ -39,9 +39,11 @@ services:
       - "8000:8000"
     volumes:
       - ./:/len_back
+#      - media_volume: /len_back/media
     depends_on:
       - db
 
 volumes:
+#  media_volume:
   pgdata:
     driver: local

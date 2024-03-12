@@ -37,11 +37,14 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'drf_spectacular',
 
     'len_back',
     'admin_app',
     'users_app',
+    'textures_app',
 ]
 
 AUTH_USER_MODEL = 'users_app.UserAccounts'
@@ -130,10 +133,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static/'
-
-MEDIA_ROOT = BASE_DIR / 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 
 # Default primary key field type
@@ -142,8 +144,6 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
@@ -168,10 +168,15 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ],
+
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
 }
 
 CORS_ORIGIN_WHITELIST = [
@@ -179,4 +184,3 @@ CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:3000",
     "http://localhost:8000",
 ]
-

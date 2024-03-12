@@ -1,6 +1,9 @@
+from datetime import timedelta
+
 from rest_framework import status, filters
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -10,12 +13,19 @@ from users_app.models import UserAccounts
 from users_app.serializers import UserSerializer, LoginSerializer, RegisterSerializer
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def me_view(request):
+    print(UserSerializer(request.user).data)
+    return Response(UserSerializer(request.user).data)
+
+
 class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
     queryset = UserAccounts.objects.all()
 
     http_method_names = ['get']
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     filter_backends = [filters.OrderingFilter]
 
     def get_queryset(self):
@@ -25,10 +35,10 @@ class UserViewSet(ModelViewSet):
     def get_object(self):
         lookup_field_value = self.kwargs[self.lookup_field]
 
-        obj = UserAccounts.objects.get(lookup_field_value)
-        self.check_object_permissions(self.request, obj)
+        user = UserAccounts.objects.get(lookup_field_value)
+        self.check_object_permissions(self.request, user)
 
-        return obj
+        return user
 
 
 class LoginViewSet(ModelViewSet, TokenObtainPairView):
@@ -57,16 +67,15 @@ class RegistrationViewSet(ModelViewSet, TokenObtainPairView):
 
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+
         refresh = RefreshToken.for_user(user)
-        res = {
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),
-        }
+        access_token = refresh.access_token
+        access_token.set_exp(lifetime=timedelta(minutes=30))
 
         return Response({
             "user": serializer.data,
-            "refresh": res["refresh"],
-            "token": res["access"]
+            "refresh": str(refresh),
+            "token": str(access_token),
         }, status=status.HTTP_201_CREATED)
 
 

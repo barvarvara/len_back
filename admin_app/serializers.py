@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from admin_app.models import Clients, Contacts, Certificates, Classes, Products
+from admin_app.models import Clients, Contacts, Certificates, Classes, Products, ClientsContacts
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -19,6 +19,19 @@ class ContactsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contacts
         fields = ('id', 'fcs', 'phone', 'birthday', 'ban_on_spam')
+        depth = 1
+
+
+class ClientContactsSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='contacts.id')
+    fcs = serializers.CharField(source='contacts.get_fcs')
+    type = serializers.CharField(source='contacts_type.name')
+    phone = serializers.CharField(source='contacts.phone')
+    client = ClientSerializer
+
+    class Meta:
+        model = ClientsContacts
+        fields = ('id', 'fcs', 'phone', 'type', 'client')
         depth = 1
 
 
